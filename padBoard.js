@@ -14,16 +14,26 @@ var Board = function(r,c) {
     this.color.push("rgb(255,213,0)");
     this.color.push("rgb(245,117,236)");
     this.n = this.color.length;
+    this.holding = false;
     this.fill();
 }
 
+Board.prototype.move_pos = function(direction) {
+    var r = this.pos[0];
+    var c = this.pos[1];
+    var newr = r+direction[0];
+    var newc = c+direction[1];
+    if (this.at(newr,newc) != null) {
+        this.pos = [newr,newc];
+    }
+}
 Board.prototype.move = function(direction) {
     var r = this.pos[0];
     var c = this.pos[1];
-    newr = r+direction[0];
-    newc = c+direction[1];
-    tmp = this.b[r*this.w+c]
-    val = this.at(newr,newc)
+    var newr = r+direction[0];
+    var newc = c+direction[1];
+    var tmp = this.b[r*this.w+c]
+    var val = this.at(newr,newc)
     if (val != null) {
         this.b[r*this.w+c] = val;
         this.b[newr*this.w+newc] = tmp;
@@ -37,7 +47,7 @@ Board.prototype.fill = function() {
         for (var c = 0; c < this.w; c++) {
             var rp = r;
             if (this.b[r*this.w+c] == 0) {
-                while (rp > 0) {
+                while (rp > 0 && this.b[(rp-1)*this.w+c] != 0) {
                     this.b[rp*this.w+c] = this.b[(rp-1)*this.w+c];
                     this.b[(rp-1)*this.w+c] = 0;
                     rp -= 1;
@@ -123,7 +133,10 @@ Board.prototype.display = function() {
         var context = canvas.getContext('2d');
         context.fillStyle = "rgb(156,256,256)";;
         context.fillRect(0,0,canvas.width,canvas.height);
-        context.fillStyle = "rgb(10,10,10)";;
+        if (this.holding)
+            context.fillStyle = "rgb(10,10,10)";
+        else
+            context.fillStyle = "rgb(156,156,156)";
         context.fillRect(30*this.pos[1],30*this.pos[0],30,30);
     } else {
         document.write("No support!");
@@ -159,28 +172,50 @@ function startGame(r,c) {
     var turns = 0;
     document.onkeydown = function (e) {
         if (e.keyCode == '38') {
-            b.move(UP);
+            if (b.holding)
+                b.move(UP);
+            else
+                b.move_pos(UP);
             turns++;
             b.display();
         }
         else if (e.keyCode == '40') {
-            b.move(DOWN);
+            if (b.holding)
+                b.move(DOWN);
+            else
+                b.move_pos(DOWN);
             turns++;
             b.display();
         }
         else if (e.keyCode == '37') {
-            b.move(LEFT);
+            if (b.holding)
+                b.move(LEFT);
+            else
+                b.move_pos(LEFT);
             turns++;
             b.display();
         }
         else if (e.keyCode == '39') {
-            b.move(RIGHT);
+            if (b.holding)
+                b.move(RIGHT);
+            else
+                b.move_pos(RIGHT);
             turns++;
             b.display();
         }
-        if (turns == 10) {
-            b.match();
+        if (e.keyCode == '32') {
+            if (b.holding) {
+                b.match();
+                b.holding = false;
+            }
+            else
+                b.holding = true;
+            b.display();
             turns = 0;
+        }
+        if (e.shiftKey == true) {
+            b.holding = true;
+            b.display();
         }
     }
     
