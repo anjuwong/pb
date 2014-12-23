@@ -8,8 +8,10 @@ var Board = function(r,c) {
     for(var i = 0; i < r*c; i++) {
         me.b.push(0);
     }
+    me.lock = false;
     me.pos = [0,0];
     me.color = []
+    me.color.push("rgb(156,156,156)");
     me.color.push("rgb(236,51,30)");
     me.color.push("rgb(57,192,23)");
     me.color.push("rgb(21,144,226)");
@@ -43,6 +45,8 @@ var Board = function(r,c) {
         }
     }
     me.fill = function() {
+        /* This function handles the falling of orbs and skyfall */
+        /* Drop the orbs down */
         for (var r = 0; r < me.h; r++) {
             for (var c = 0; c < me.w; c++) {
                 var rp = r;
@@ -61,7 +65,7 @@ var Board = function(r,c) {
             for (var c = 0; c < me.w; c++) {
                 if (me.b[r*me.w+c] == 0) {
                     hadFill = true;
-                    me.b[r*me.w+c] = Math.floor((Math.random() * me.n)+1);
+                    me.b[r*me.w+c] = Math.floor((Math.random() * (me.n-1))+1);
                 }
             }
         }
@@ -69,11 +73,15 @@ var Board = function(r,c) {
 
         /* If hadFill is false, nothing was filled */
         if (!hadFill)
+        {
+            me.lock = false;
             return false;
-        me.match();
+        }
+        setTimeout(me.match,300);
         return true;
     }
     me.at = function(r,c) {
+        /* Returns the value on the board at position r,c */
         if (c < 0 || c > me.w-1)
             return null;
         if (r < 0 || r > me.h-1)
@@ -81,6 +89,8 @@ var Board = function(r,c) {
         return me.b[r*me.w+c]
     }
     me.match = function() {
+        /* Changes all matches of 3+ to 0 on the board */
+        me.lock = true;
         var toClear = [];
         for (var r = 0; r < me.h; r++) 
         {
@@ -111,9 +121,11 @@ var Board = function(r,c) {
         {
             me.b[toClear[t][0]*me.w+toClear[t][1]] = 0;
         }
-        me.fill();
-        me.time = 5;
+        me.display();
         clearInterval(me.timer);
+        setTimeout(me.fill,300);
+        //me.fill();
+        me.time = 5;
     }
     me.display = function() {
         var canvas = document.getElementById("bcanvas");
@@ -134,12 +146,12 @@ var Board = function(r,c) {
         for (var r = 0; r < me.h; r++) {
             //var s = "";
             for (var c = 0; c < me.w; c++) {
-                if(me.b[me.w*r+c] == 0) {
+                /*if(me.b[me.w*r+c] == 0) {
                     fillPos(c,r,"rgb(156,156,156)");
                 }
-                else {
-                    fillPos(c,r,me.color[me.b[me.w*r+c]-1]);
-                }//s = s + (me.b[me.w*r+c]).toString();
+                else {*/
+                    fillPos(c,r,me.color[me.b[me.w*r+c]]);
+                //}//s = s + (me.b[me.w*r+c]).toString();
             }
         }
         fillTimer(me.time);
@@ -189,7 +201,9 @@ function startGame(r,c) {
     var turns = 0;
     var first_move_done = false;
     document.onkeydown = function (e) {
-        if (e.keyCode == '38') {
+        if (b.lock)
+            {}
+        else if (e.keyCode == '38') {
             if (b.holding)
                 b.move(UP);
             else
@@ -238,7 +252,7 @@ function startGame(r,c) {
             turns++;
             b.display();
         }
-        if (e.keyCode == '32') {
+        else if (e.keyCode == '32') {
             if (b.holding) {
                 b.match();
                 b.holding = false;
@@ -247,12 +261,12 @@ function startGame(r,c) {
             else {
                 b.holding = true;
                 first_move_done = false;
-                b.match();
+               // b.match();
             }
             b.display();
             turns = 0;
         }
-        if (e.shiftKey == true) {
+        else if (e.shiftKey == true) {
             if (b.holding) {
                 b.match();
                 b.holding = false;
@@ -261,7 +275,7 @@ function startGame(r,c) {
             else {
                 b.holding = true;
                 first_move_done = false;
-                b.match();
+                //b.match();
             }
             b.display();
             turns = 0;
