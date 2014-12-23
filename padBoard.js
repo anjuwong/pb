@@ -142,11 +142,12 @@ var Board = function(r,c) {
                 }//s = s + (me.b[me.w*r+c]).toString();
             }
         }
+        fillTimer(me.time);
     }
     me.start_timer = function() {
         me.timer = setInterval(function() {
             me.time -= 1;
-            fillTimer(5-me.time);
+            fillTimer(me.time);
             if (me.time == 0) {
                 me.time = 5;
                 me.holding = false;
@@ -173,8 +174,8 @@ function fillTimer(t) {
     var canvas = document.getElementById("bcanvas");
     if (canvas.getContext) {
         var context = canvas.getContext('2d');
-        context.fillStyle = "rgb(0,0,0)";
-        context.fillRect(150,0,150*t/5,25);
+        context.fillStyle = "rgb(156,156,156)";
+        context.fillRect(2.5,152.5,170*(5-t)/5,25);
     } else {
         document.write("No support!");
     }
