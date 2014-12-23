@@ -59,12 +59,12 @@ var Board = function(r,c) {
                 }
             }
         }
-        var hadFill = false;
+        //var hadFill = false;
         /* Fill in random orbs */
         for (var r = 0; r < me.h; r++) {
             for (var c = 0; c < me.w; c++) {
                 if (me.b[r*me.w+c] == 0) {
-                    hadFill = true;
+        //            hadFill = true;
                     me.b[r*me.w+c] = Math.floor((Math.random() * (me.n-1))+1);
                 }
             }
@@ -72,13 +72,13 @@ var Board = function(r,c) {
         me.display();
 
         /* If hadFill is false, nothing was filled */
-        if (!hadFill)
-        {
-            me.lock = false;
-            return false;
-        }
+        //if (!hadFill)
+        //{
+        //    me.lock = false;
+        //    return false;
+        //}
         setTimeout(me.match,300);
-        return true;
+        //return true;
     }
     me.at = function(r,c) {
         /* Returns the value on the board at position r,c */
@@ -117,9 +117,16 @@ var Board = function(r,c) {
             }    
         }
         var len = toClear.length;
+        var somecleared = false;
         for (var t = 0; t < len; t++)
         {
             me.b[toClear[t][0]*me.w+toClear[t][1]] = 0;
+            somecleared = true;
+        }
+        if (!somecleared)
+        {
+            me.lock = false;
+            return;
         }
         me.display();
         clearInterval(me.timer);
