@@ -123,13 +123,14 @@ var Board = function(r,c) {
             me.b[toClear[t][0]*me.w+toClear[t][1]] = 0;
             somecleared = true;
         }
+        me.display();
+        clearInterval(me.timer);
         if (!somecleared)
         {
+            me.time = 5;
             me.lock = false;
             return;
         }
-        me.display();
-        clearInterval(me.timer);
         setTimeout(me.fill,300);
         //me.fill();
         me.time = 5;
@@ -168,6 +169,7 @@ var Board = function(r,c) {
             me.time -= 1;
             fillTimer(me.time);
             if (me.time == 0) {
+                clearInterval(me.timer);
                 me.time = 5;
                 me.holding = false;
                 me.match();
